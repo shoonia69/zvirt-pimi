@@ -1,0 +1,27 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ovirt_auth_vars.yml
+  tasks:
+    - name: Login
+      ovirt_auth:
+        url: "{{ url }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+
+    - ovirt.ovirt.ovirt_disk:
+        auth: "{{ ovirt_auth }}"
+        name: a23_thin_disk
+        size: 10GiB
+        format: cow
+        interface: virtio
+        storage_domain: NFS
+  
+    - name: Logout from oVirt
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+      when: not loggedin.skipped | default(false)

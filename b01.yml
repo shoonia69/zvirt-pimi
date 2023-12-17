@@ -1,0 +1,43 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ovirt_auth_vars.yml
+  tasks:
+    - name: Login
+      ovirt_auth:
+        url: "{{ url }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+
+    - ovirt.ovirt.ovirt_disk:
+        auth: "{{ ovirt_auth }}"
+        name: b01_thin_disk
+        size: 1GiB
+        format: cow
+        interface: virtio
+        storage_domain: NFS
+
+    - ovirt.ovirt.ovirt_vm:
+        auth: "{{ ovirt_auth }}"
+        state: present
+        cluster: Default
+        name: server_vm
+        memory: 2GiB
+        cpu_cores: 2
+        cpu_sockets: 2
+        cpu_shares: 1024
+        type: server
+        disks:
+          - name: b01_thin_disk
+            bootable: True
+        nics:
+          - name: nic1
+  
+    - name: Logout from oVirt
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+      when: not loggedin.skipped | default(false)

@@ -1,0 +1,33 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ovirt_auth_vars.yml
+  vars:
+    vm_name: b07
+    storage_domain: NFS
+    vm_type: server
+    vm_os: other_linux
+  tasks:
+    - name: Login
+      ovirt_auth:
+        url: "{{ url }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: loggedin
+    - ansible.builtin.include_role:
+        name: create_thin_disk
+    - ansible.builtin.include_role:
+        name: create_linux_vm
+    
+
+
+
+
+    - name: Logout from oVirt
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+      when: not loggedin.skipped | default(false)

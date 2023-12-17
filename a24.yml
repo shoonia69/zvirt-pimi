@@ -1,0 +1,30 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ovirt_auth_vars.yml
+  tasks:
+    - name: Login
+      ovirt_auth:
+        url: "{{ url }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+
+    # Create and attach new disk to VM
+    - ovirt.ovirt.ovirt_disk:
+        auth: "{{ ovirt_auth }}"
+        name: a24_preallocated_disk
+        size: 1GiB
+        format: raw
+        interface: virtio
+        storage_domain: NFS
+        
+
+
+    - name: Logout from oVirt
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+      when: not loggedin.skipped | default(false)

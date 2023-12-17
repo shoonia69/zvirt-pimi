@@ -1,0 +1,50 @@
+---
+## этот плейбук создает на хосте папку ISO и скачивает в нее минимальный образ дистрибутива 
+## Альма линукс. Далее этот образ аплоадится в заданное в переменных хранилище
+## 
+
+- name: prepare for pimi tests
+  become: true
+  gather_facts: false
+  hosts: localhost 
+  vars_files:
+    - ovirt_auth_vars.yml
+  vars:
+    iso_folder: /iso
+    storage_domain: NFS
+    iso_url: https://repo.almalinux.org/almalinux/9.3/isos/x86_64/AlmaLinux-9.3-x86_64-minimal.iso
+  tasks:
+    - name: create dir for iso
+      ansible.builtin.file:
+        path: "{{ iso_folder }}"
+        state: directory
+        mode: 0777
+    - name: download iso for vm 
+      ansible.builtin.get_url:
+        url: "{{ iso_url }}"
+        dest: "{{ iso_folder }}"
+        mode: 0777
+    - name: Login
+      ovirt_auth:
+        url: "{{ url }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: loggedin
+    - ovirt.ovirt.ovirt_disk:
+        auth: "{{ ovirt_auth }}"
+        name: alma 
+        upload_image_path: "{{ iso_folder }}/AlmaLinux-9.3-x86_64-minimal.iso"
+        storage_domain: "{{ storage_domain }}"
+        format: raw
+        content_type: iso
+        wait: true
+
+
+    - name: Logout from oVirt
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+      when: not loggedin.skipped | default(false)
+    
+  
+

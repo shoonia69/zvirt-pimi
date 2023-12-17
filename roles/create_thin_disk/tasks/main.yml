@@ -1,0 +1,9 @@
+---
+# tasks file for create_thin_disk
+    - ovirt.ovirt.ovirt_disk:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ vm_name }}_thin_disk"
+        size: 1GiB
+        format: cow
+        interface: virtio
+        storage_domain: "{{ storage_domain }}"

@@ -1,0 +1,8 @@
+---
+# tasks file for ovirt_login
+    - name: Login
+      ovirt_auth:
+        url: "{{ url }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: loggedin

@@ -1,0 +1,6 @@
+## используется для задания переменных для логина в Звирт
+
+---
+        url: "https://ps-eng40-engine.ps.local/ovirt-engine/api"
+        username: "admin@internal"
+        password: "SuperSecretPassword"

@@ -1,0 +1,7 @@
+---
+# tasks file for ovirt_logout
+    - name: Logout from oVirt
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
+      when: not loggedin.skipped | default(false)

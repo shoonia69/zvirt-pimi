@@ -11,8 +11,9 @@
     - ovirt_auth_vars.yml
   vars:
     iso_folder: /iso
+    ova_folder: /ova
     storage_domain: NFS
-    iso_url: https://repo.almalinux.org/almalinux/9.3/isos/x86_64/AlmaLinux-9.3-x86_64-minimal.iso
+    iso_url: 
     ova_url: 
   tasks:
     - name: create dir for iso
@@ -20,17 +21,22 @@
         path: "{{ iso_folder }}"
         state: directory
         mode: 0777
+    - name: create dir for iso
+      ansible.builtin.file:
+        path: "{{ ova_folder }}"
+        state: directory
+        mode: 0777
     - name: download iso for vm 
       ansible.builtin.get_url:
         url: "{{ iso_url }}"
         dest: "{{ iso_folder }}"
         mode: 0777
+
+
     - name: Login
-      ovirt_auth:
-        url: "{{ url }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-      register: loggedin
+      ansible.builtin.include_role:
+        name: ovirt_login
+
     - ovirt.ovirt.ovirt_disk:
         auth: "{{ ovirt_auth }}"
         name: alma 
@@ -42,10 +48,8 @@
 
 
     - name: Logout from oVirt
-      ovirt_auth:
-        state: absent
-        ovirt_auth: "{{ ovirt_auth }}"
-      when: not loggedin.skipped | default(false)
+      ansible.builtin.include_role:
+        name: ovirt_logout
     
   
 

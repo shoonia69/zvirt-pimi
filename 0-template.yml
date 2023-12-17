@@ -1,0 +1,22 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/ovirt_auth_vars.yml
+  vars:
+    vm_name: b12
+    storage_domain: NFS
+    vm_type: server
+    vm_os: other_linux
+  tasks:
+    - name: Login
+      ansible.builtin.include_role:
+        name: ovirt_login
+
+
+
+    - name: Logout from oVirt
+      ansible.builtin.include_role:
+        name: ovirt_logout

@@ -13,6 +13,7 @@
     iso_folder: /iso
     storage_domain: NFS
     iso_url: https://repo.almalinux.org/almalinux/9.3/isos/x86_64/AlmaLinux-9.3-x86_64-minimal.iso
+    ova_url: 
   tasks:
     - name: create dir for iso
       ansible.builtin.file:

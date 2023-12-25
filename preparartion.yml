@@ -21,17 +21,20 @@
         path: "{{ iso_folder }}"
         state: directory
         mode: 0777
-    - name: create dir for iso
+    - name: create dir for ova
       ansible.builtin.file:
         path: "{{ ova_folder }}"
         state: directory
         mode: 0777
+        owner: 36
+        group: 36
     - name: download iso for vm 
       ansible.builtin.get_url:
         url: "{{ iso_url }}"
         dest: "{{ iso_folder }}"
         mode: 0777
-
+        owner: 36
+        group: 36
 
     - name: Login
       ansible.builtin.include_role:

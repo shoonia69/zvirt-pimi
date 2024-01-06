@@ -1,0 +1,15 @@
+---
+  nfs_mount_folder: /mnt
+  nfs_share: 10.251.30.1:/nfs
+  storage_dest: NFS
+  iso_folder: /iso
+  ova_folder: /ova
+  
+  ova_images:
+   - filename: "1"
+     dest: "{{ ova_folder }}"
+     ova_name: "alma.ova"
+   - filename: "2"
+     dest: "{{ ova_folder }}"
+     ova_name: "alma-temp.ova"   
+    

@@ -4,12 +4,7 @@
   hosts: localhost 
   vars_files:
     - ovirt_auth_vars.yml
-  vars:
-    nfs_mount_folder: /mnt
-    nfs_share: 10.251.30.1:/nfs
-    storage_dest: NFS
-    iso_folder: /iso
-    ova_folder: /ova
+    - preparation_nfs_vars.yml
        
   tasks:
     - name: Mount an NFS volume
@@ -64,17 +59,16 @@
       ovirt.ovirt.ovirt_template:
         auth: "{{ ovirt_auth }}"
         cluster: Default
-        name: "{{ item }}"
+        name: "{{ item.ova_name }}"
         state: present
         timeout: 1800
         poll_interval: 30
         kvm:
           host: "{{ ansible_facts['fqdn'] }}"
-          url: ova:///"{{ item }}"
+          url: ova:///"{{ item.dest }}/{{ item.ova_name }}"
           storage_domain: "{{ storage_dest }}"
-      with_fileglob:
-        - "{{ ova_folder }}/*.ova"
-
+      with_items: "{{ ova_images }}"
+      
     - name: Logout from oVirt
       ansible.builtin.include_role:
         name: ovirt_logout

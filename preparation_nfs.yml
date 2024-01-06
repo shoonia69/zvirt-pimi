@@ -1,0 +1,80 @@
+---
+- name: prepare for pimi tests
+  gather_facts: true
+  hosts: localhost 
+  vars_files:
+    - ovirt_auth_vars.yml
+  vars:
+    nfs_mount_folder: /mnt
+    nfs_share: 10.251.30.1:/nfs
+    storage_dest: NFS
+    iso_folder: /iso
+    ova_folder: /ova
+       
+  tasks:
+    - name: Mount an NFS volume
+      ansible.posix.mount:
+        src: "{{ nfs_share }}"
+        path: "{{ nfs_mount_folder }}"
+        opts: rw,sync
+        state: mounted
+        fstype: nfs
+    
+    - name: create dir for iso
+      ansible.builtin.file:
+        path: "{{ iso_folder }}"
+        state: directory
+        mode: 0777
+        owner: 36
+        group: 36
+
+    - name: create dir for ova
+      ansible.builtin.file:
+        path: "{{ ova_folder }}"
+        state: directory
+        mode: 0777
+        owner: 36
+        group: 36
+    
+    - name: Copy ISO to dest dir
+      copy:
+        src: "{{ item }}"
+        dest: "{{ iso_folder }}"
+        owner: 36
+        group: 36
+        mode: '0777'
+      with_fileglob:
+        - "{{ nfs_mount_folder }}/*.iso" 
+      
+    - name: Copy OVA to dest dir
+      copy:
+        src: "{{ item }}"
+        dest: "{{ ova_folder }}"
+        owner: 36
+        group: 36
+        mode: '0777'
+      with_fileglob:
+        - "{{ nfs_mount_folder }}/*.ova"
+        
+    - name: Login
+      ansible.builtin.include_role:
+        name: ovirt_login
+
+    - name: Import external ova template
+      ovirt.ovirt.ovirt_template:
+        auth: "{{ ovirt_auth }}"
+        cluster: Default
+        name: "{{ item }}"
+        state: present
+        timeout: 1800
+        poll_interval: 30
+        kvm:
+          host: "{{ ansible_facts['fqdn'] }}"
+          url: ova:///"{{ item }}"
+          storage_domain: "{{ storage_dest }}"
+      with_fileglob:
+        - "{{ ova_folder }}/*.ova"
+
+    - name: Logout from oVirt
+      ansible.builtin.include_role:
+        name: ovirt_logout

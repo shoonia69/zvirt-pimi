@@ -21,3 +21,8 @@
     - name: Logout from oVirt
       ansible.builtin.include_role:
         name: ovirt_logout
+
+
+
+auth: "{{ ovirt_auth }}"
+

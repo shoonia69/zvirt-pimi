@@ -1,0 +1,35 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ovirt_auth_vars.yml
+    - stand.yml
+  vars:
+    vm_name: b08
+    vm_type: server
+    vm_os: other_linux
+
+  tasks:
+    - name: Login
+      ansible.builtin.include_role:
+        name: ovirt_login
+    
+    - name: Create VM 
+      ansible.builtin.include_role:
+        name: create_vm_alma_temp_and_run
+
+    - name: attache NIC
+      ovirt.ovirt.ovirt_vm:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ vm_name }}"
+        nics:
+          - name: nic_virtio
+            interface: "virtio"
+          - name: nic_e1000e
+            interface: "e1000e"
+
+    - name: Logout from oVirt
+      ansible.builtin.include_role:
+        name: ovirt_logout

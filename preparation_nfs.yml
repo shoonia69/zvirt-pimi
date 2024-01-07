@@ -40,16 +40,24 @@
         mode: '0777'
       with_fileglob:
         - "{{ nfs_mount_folder }}/*.iso" 
-      
+
+  ## ЗАТУПИЛ СО СЛОВАРЕМ, МОЖНО СДЕЛАТЬ ЭЛЕГАНТНЕЕ, ЛОЛ
+
     - name: Copy OVA to dest dir
       copy:
-        src: "{{ item }}"
+        src: /mnt/alma.ova
         dest: "{{ ova_folder }}"
         owner: 36
         group: 36
         mode: '0777'
-      with_fileglob:
-        - "{{ nfs_mount_folder }}/*.ova"
+
+    - name: Copy OVA to dest dir
+      copy:
+        src: /mnt/alma-temp.ova
+        dest: "{{ ova_folder }}"
+        owner: 36
+        group: 36
+        mode: '0777'
         
     - name: Login
       ansible.builtin.include_role:
@@ -72,3 +80,8 @@
     - name: Logout from oVirt
       ansible.builtin.include_role:
         name: ovirt_logout
+
+    - name: Unmount a mounted volume
+      ansible.posix.mount:
+        path: "{{ nfs_mount_folder }}"
+        state: unmounted

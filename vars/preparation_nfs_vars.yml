@@ -6,10 +6,9 @@
   ova_folder: /ova
   
   ova_images:
-   - filename: "1"
-     dest: "{{ ova_folder }}"
+   - dest: "{{ nfs_mount_folder }}"
      ova_name: "alma.ova"
-   - filename: "2"
-     dest: "{{ ova_folder }}"
+   - dest: "{{ nfs_mount_folder }}"
      ova_name: "alma-temp.ova"   
-    
+   - dest: "{{ nfs_mount_folder }}"
+     ova_name: "win-temp.ova"       

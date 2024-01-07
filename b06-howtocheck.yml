@@ -1,0 +1,57 @@
+---
+- name: check connection to engine 
+  become: true
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ovirt_auth_vars.yml
+    - stand.yml
+  vars:
+    vm_name: b06
+    vm_type: server
+    vm_os: Linux
+    
+  tasks:
+    - name: Login
+      ansible.builtin.include_role:
+        name: ovirt_login
+
+    - name: Creates a new Virtual Machine from template
+      ovirt.ovirt.ovirt_vm:
+        auth: "{{ ovirt_auth }}"
+        state: present
+        name: "{{ vm_name }}"
+        template: "{{ vm_template_linux }}"
+        cluster: "{{ vm_cluster_default }}"
+
+    - name: Run VM with cloud init
+      ovirt.ovirt.ovirt_vm:
+        auth: "{{ ovirt_auth }}"
+        name: "{{ vm_name }}"
+        cluster: "{{ vm_cluster_default }}"
+        state: running
+        cloud_init:
+          dns_servers: '8.8.8.8 8.8.4.4'
+          nic_boot_protocol: static
+          nic_ip_address: 192.168.0.100
+          nic_netmask: 255.255.255.0
+          nic_gateway: 
+          nic_name: enp1s0
+          host_name: cloud-init-test.com
+          user_name: root
+          root_password: "123"
+
+
+    # ДАННАЯ ТЕМА НЕ ОТОБРАЖАЕТ НУЖНЫЙ АЙПИ, ЗАДАННЫЙ С CLOUD INIT. 
+
+    # - ovirt.ovirt.ovirt_vm_info:
+    #     auth: "{{ ovirt_auth }}"
+    #     pattern: name="{{ vm_name }}" and cluster="{{ vm_cluster }}"
+    #     fetch_nested: true
+    #   register: result
+    # - ansible.builtin.debug:
+    #     msg: "{{ result.ovirt_vms }}"
+
+    - name: Logout from oVirt
+      ansible.builtin.include_role:
+        name: ovirt_logout

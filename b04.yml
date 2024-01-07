@@ -5,18 +5,15 @@
   gather_facts: false
   vars_files:
     - ovirt_auth_vars.yml
+    - stand.yml
   vars:
     vm_name: b04
-    storage_domain: NFS
     vm_type: server
     vm_os: Linux
   tasks:
     - name: Login
-      ovirt_auth:
-        url: "{{ url }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-      register: loggedin
+      ansible.builtin.include_role:
+        name: ovirt_login
 
     - ovirt.ovirt.ovirt_disk:
         auth: "{{ ovirt_auth }}"
@@ -24,11 +21,11 @@
         size: 1GiB
         format: cow
         interface: virtio
-        storage_domain: NFS
+        storage_domain: "{{ storage_nfs }}"
     - ovirt.ovirt.ovirt_vm:
         auth: "{{ ovirt_auth }}"        
         state: present
-        cluster: Default
+        cluster: "{{ vm_cluster_default }}"
         name: "{{ vm_name }}"
         memory: 2GiB
         cpu_cores: 2
@@ -49,7 +46,5 @@
         name: "{{ vm_name }}"
 
     - name: Logout from oVirt
-      ovirt_auth:
-        state: absent
-        ovirt_auth: "{{ ovirt_auth }}"
-      when: not loggedin.skipped | default(false)
+      ansible.builtin.include_role:
+        name: ovirt_logout

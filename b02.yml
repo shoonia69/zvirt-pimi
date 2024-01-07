@@ -7,10 +7,8 @@
     - ovirt_auth_vars.yml
   tasks:
     - name: Login
-      ovirt_auth:
-        url: "{{ url }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
+      ansible.builtin.include_role:
+        name: ovirt_login
 
     - ovirt.ovirt.ovirt_disk:
         auth: "{{ ovirt_auth }}"
@@ -37,7 +35,5 @@
           - name: nic1
   
     - name: Logout from oVirt
-      ovirt_auth:
-        state: absent
-        ovirt_auth: "{{ ovirt_auth }}"
-      when: not loggedin.skipped | default(false)
+      ansible.builtin.include_role:
+        name: ovirt_logout

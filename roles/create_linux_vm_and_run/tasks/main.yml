@@ -2,8 +2,8 @@
 # tasks file for create_linux_vm
     - ovirt.ovirt.ovirt_vm:
         auth: "{{ ovirt_auth }}"        
-        state: present
-        cluster: Default
+        state: running
+        cluster: "{{ vm_cluster_default }}"
         name: "{{ vm_name }}"
         memory: 2GiB
         cpu_cores: 2

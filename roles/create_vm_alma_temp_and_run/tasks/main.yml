@@ -1,0 +1,9 @@
+---
+# tasks file for create_vm_alma_temp_and_run
+      - name: Creates a new Virtual Machine from template
+        ovirt.ovirt.ovirt_vm:
+          auth: "{{ ovirt_auth }}"
+          state: running
+          name: "{{ vm_name }}"
+          template: "{{ vm_template_linux }}"
+          cluster: "{{ vm_cluster_default }}"

@@ -5,20 +5,32 @@
   gather_facts: false
   vars_files:
     - ovirt_auth_vars.yml
+    - stand.yml
+  vars:
+    vm_name: b07
+    vm_type: server
+    vm_os: other_linux
+   
   tasks:
     - name: Login
       ansible.builtin.include_role:
         name: ovirt_login
+      register: loggedin
 
-    - name: Create RAW disk
+    - name: Creates a new Virtual Machine from template
+      ansible.builtin.include_role:
+        name: create_vm_alma_temp_and_run
+
+    - name: create additional disk
       ovirt.ovirt.ovirt_disk:
         auth: "{{ ovirt_auth }}"
-        name: a24_preallocated_disk
+        name: "{{ vm_name }}_thin_disk"
+        vm_name: "{{ vm_name }}"
         size: 1GiB
-        format: raw
+        format: cow
         interface: virtio
-        storage_domain: NFS
- 
+        storage_domain: "{{ storage_nfs }}"
+
     - name: Logout from oVirt
       ansible.builtin.include_role:
         name: ovirt_logout

@@ -4,12 +4,13 @@
   hosts: localhost
   gather_facts: false
   vars_files:
-    - vars/ovirt_auth_vars.yml
+    - ovirt_auth_vars.yml
+    - stand.yml
   vars:
     vm_name: b12
-    storage_domain: NFS
     vm_type: server
     vm_os: other_linux
+
   tasks:
     - name: Login
       ansible.builtin.include_role:

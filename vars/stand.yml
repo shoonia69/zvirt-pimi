@@ -1,0 +1,9 @@
+---
+  storage_nfs: NFS
+  storage_iscsi: iSCSI
+  storage_export: Export
+
+  vm_template_linux: alma-temp.ova
+  vm_template_win: win-temp.ova
+
+  vm_cluster_default: Default

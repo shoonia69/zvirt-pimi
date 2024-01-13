@@ -26,3 +26,10 @@
 
 auth: "{{ ovirt_auth }}"
 
+    - name: Remove vm after finish
+      ansible.builtin.include_role:
+        name: remove_vm
+
+    - name: Remove vm after finish
+      ansible.builtin.include_role:
+        name: create_vm_alma_temp_and_dont_run

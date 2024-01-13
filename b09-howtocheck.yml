@@ -7,30 +7,32 @@
     - ovirt_auth_vars.yml
     - stand.yml
   vars:
-    vm_name: b12
+    vm_name: b09
     vm_type: server
     vm_os: other_linux
+
   tasks:
     - name: Login
       ansible.builtin.include_role:
         name: ovirt_login
 
-    - name: create vm
+    - name: create vm 
       ansible.builtin.include_role:
         name: create_vm_alma_temp_and_dont_run
 
-    - ovirt.ovirt.ovirt_disk_info:
+    - name: create sub-version template
+      ovirt.ovirt.ovirt_template:
         auth: "{{ ovirt_auth }}"
-        pattern: name="{{ vm_name }}"
-      register: result
-    - ansible.builtin.debug:
-        msg: "{{ result.ovirt_disks }}"
+        cluster: "{{ vm_cluster_default }}"
+        name: "{{ vm_template_linux }}"
+        vm: "{{ vm_name }}"
+        version:
+            name: ansible_subversion_temp
+            version: 2
 
-    - name: "Move disk"
-      ovirt.ovirt.ovirt_disk:
-        auth: "{{ ovirt_auth }}"
-        id: "{{ result.ovirt_disks }}"
-        storage_domain: "{{ storage_iscsi }}"
+    - name: Remove vm after finish
+      ansible.builtin.include_role:
+        name: remove_vm
 
     - name: Logout from oVirt
       ansible.builtin.include_role:
